@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, Boolean, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app import db, app
+from flask_login import UserMixin
+import hashlib
+from enum import Enum as RoleEnum
 
 
 class Category(db.Model):
@@ -25,16 +28,39 @@ class Product(db.Model):
         return self.name
 
 
+class UserRole(RoleEnum):
+    USER =1
+    ADMIN =2
+
+
+class User(db.Model, UserMixin):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50))
+    username = Column(String(50), unique=True, nullable=False)
+    password = Column(String(50), nullable=False)
+    user_role = Column(Enum(UserRole), default=UserRole.USER)
+
+
 if __name__ == '__main__':
     with app.app_context():
         # db.create_all()
+        #
+        # u = User(name='admin',
+        #          username='admin',
+        #          password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #          user_role=UserRole.ADMIN)
+        # u2 = User(name='admin',
+        #           username='user1',
+        #           password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()))
+        # db.session.add_all([u,u2])
+        # db.session.commit()
         # c1 = Category(name='Mobile')
         # c2 = Category(name='Tablet')
         # c3 = Category(name='Laptop')
-
+        #
         # db.session.add_all([c1, c2, c3])
         # db.session.commit()
-
+        #
         # products = [{
         #     "name": "iPhone 7 Plus",
         #     "description": "Apple, 32GB, RAM: 3GB, iOS13",

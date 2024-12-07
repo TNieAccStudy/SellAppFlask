@@ -1,5 +1,6 @@
-from app.models import Category, Product
-from app import app
+from app.models import Category, Product, User
+from app import app, db
+import hashlib
 
 
 def load_categories():
@@ -23,3 +24,23 @@ def load_products(cate_id=None, kw=None, page=1):
 
 def get_product_count():
     return Product.query.count()
+
+
+def auth_user(username, password):  # filter mechanism is what ?
+    password = hashlib.md5(password.strip().encode('utf-8')).hexdigest()
+    u = User.query.filter(User.username.__eq__(username),
+                          User.password.__eq__(password))
+    return u.first()
+
+
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
+
+
+def add_user(name, username, password):
+    password = hashlib.md5(password.strip().encode('utf-8')).hexdigest()
+    u = User(name=name, username=username, password=password)
+    User()
+    db.session.add(u)
+    db.session.commit()
+
